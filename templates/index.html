@@ -6,16 +6,38 @@
     href="{{ url_for('static', filename='dog.png') }}"
   />
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+  <script>
+    function sendRequest() {
+      // 代码实现对 OpenAI API 的请求
+      const userInput = document.getElementById("user-input").value;
+      const API_KEY = "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";
+      <!-- const API_KEY = process.env.OPENAI_API_KEY; -->
+      const API_ENDPOINT = `https://api.openai.com/v1/engines/text-davinci/jobs?api_key=${API_KEY}`;
+
+      fetch(API_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          prompt: userInput,
+          max_tokens: 100
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const response = data.choices[0].text;
+          document.getElementById("response").innerHTML = response;
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+        }
+  </script>
 </head>
 
 <body>
-  <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
-  <h3>Name my pet</h3>
-  <form action="/" method="post">
-    <input type="text" name="animal" placeholder="Enter an animal" required />
-    <input type="submit" value="Generate names" />
-  </form>
-  {% if result %}
-  <div class="result">{{ result }}</div>
-  {% endif %}
+    <input type="text" id="user-input">
+    <button onclick="sendRequest()">Submit</button>
+    <div id="response"></div>
 </body>
